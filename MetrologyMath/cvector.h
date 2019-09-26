@@ -34,6 +34,6 @@ void DestroyCVector(p_cvector);
 byte CVectorPush(p_cvector target, void const* const value);
 void CVectorPop(p_cvector target);
 void CVectorClear(p_cvector);
-void* CVectorEnumerate(p_cvector, size_t idx);
+void* CVectorEnumerate(const p_cvector, size_t idx);
 
 #endif // !_CVECTOR_H_

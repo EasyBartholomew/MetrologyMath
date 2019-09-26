@@ -54,7 +54,7 @@ void CVectorEnsureCapacity(p_cvector target) {
 
 	if (!target) {
 		SetLastLocalERROR(LERROR_INVALID_PTR);
-		return NULL;
+		return;
 	}
 
 	if (!target->elem_size)

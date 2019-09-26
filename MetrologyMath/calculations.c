@@ -3,7 +3,7 @@
 #include "calculations.h"
 
 
-int K(const p_cvector _nums) {
+int calcK(const p_cvector _nums) {
 	return (int)(1 + 3.2 * log10(_nums->size)) + 1;
 }
 
@@ -25,7 +25,7 @@ double square(double n) {
 }
 
 
-int dX(const p_cvector _nums, int K) {
+int calcdX(const p_cvector _nums, int K) {
 	qsort(_nums->stock, _nums->size, _nums->elem_size, compare_double);
 
 	double* nums = (double*)_nums->stock;
@@ -34,7 +34,7 @@ int dX(const p_cvector _nums, int K) {
 }
 
 
-double AvgX(const p_cvector _nums) {
+double calcAvgX(const p_cvector _nums) {
 	qsort(_nums->stock, _nums->size, _nums->elem_size, compare_double);
 
 	double* nums = (double*)_nums->stock;
@@ -43,7 +43,7 @@ double AvgX(const p_cvector _nums) {
 }
 
 
-double X(const p_cvector _nums) {
+double calcX(const p_cvector _nums) {
 	double sum = 0.0;
 	double* nums = (double*)_nums->stock;
 
@@ -54,7 +54,7 @@ double X(const p_cvector _nums) {
 }
 
 
-double Sx(const p_cvector _nums, double X) {
+double calcSx(const p_cvector _nums, double X) {
 	double sum = 0.0;
 	double* nums = (double*)_nums->stock;
 

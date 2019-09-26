@@ -8,17 +8,21 @@ return val;\
 }
 
 
-byte FReadAllTo(cstr_t* target, const cstr_t path) {
+cvector FReadAllToVec(const cstr_t path) {
 
-	if (!path)
-		NULL_AND_RETURN(target, 0);
+	cvector stock = CreateCVector(sizeof(char), 0);
+
+	if (!path) {
+		SetLastLocalERROR(LERROR_INVALID_PARAM);
+		return stock;
+	}
 
 	FILE* target_file = fopen(path, "r");
 
-	if (!target_file)
-		NULL_AND_RETURN(target, 0);
-
-	cvector stock = CreateCVector(sizeof(char), 0);
+	if (!target_file) {
+		SetLastLocalERROR(LERROR_INVALID_PARAM); //Change latter
+		return stock;
+	}
 
 	{
 		char temp;
@@ -36,12 +40,7 @@ byte FReadAllTo(cstr_t* target, const cstr_t path) {
 
 	fclose(target_file);
 
-	*target = (cstr_t)malloc(sizeof(char) * (stock.size + 1));
-
-	memset(*target, 0, sizeof(char) * (stock.size + 1));
-	memcpy(*target, stock.stock, stock.size * stock.elem_size);
-
-	DestroyCVector(&stock);
+	return stock;
 }
 
 
@@ -101,8 +100,9 @@ inline byte isnum(char c) {
 }
 
 
-error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx,
-	const cstr_t _in, const cstr_t _out, cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip) {
+int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
+	const cstr_t _in, const cstr_t _out,
+	cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip) {
 
 	if (!_separators) {
 		_separators = DEFAULT_SEPARATORS;
@@ -110,28 +110,28 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 
 	if (!target) {
 		SetLastLocalERROR(LERROR_INVALID_PTR);
-		return GetLastLocalERROR();
+		return 0;
 	}
 
 	if (target->elem_size != sizeof(double)) {
 		SetLastLocalERROR(LERROR_INVALID_PARAM);
-		return GetLastLocalERROR();
+		return 0;
 	}
 
 	if (!_src) {
 		SetLastLocalERROR(LERROR_INVALID_PTR);
-		return GetLastLocalERROR();
+		return 0;
 	}
 
-	size_t idx, srclen, sepscnt;
-	idx = 0;
-	_end_idx = &idx;
+	size_t idx, srclen, sepscnt, seen_out;
+
+	seen_out = idx = 0;
 
 	char divider = localeconv()->decimal_point[0];
 
 	if (strchr(_separators, divider)) {
 		SetLastLocalERROR(LERROR_INVALID_PARAM);
-		return GetLastLocalERROR();
+		return 0;
 	}
 
 	sepscnt = strlen(_separators);
@@ -155,7 +155,7 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 		}
 
 		SetLastLocalERROR(LERROR_INVALID_FORMAT);
-		return GetLastLocalERROR();
+		return 0;
 
 	___in_end_if___:;
 	}
@@ -179,7 +179,7 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 					SetLastLocalERROR(LERROR_INVALID_FORMAT);
 					CVectorClear(target);
 					DestroyCVector(&coms);
-					return GetLastLocalERROR();
+					return 0;
 				}
 
 				if ((_src[idx] == divider) &&
@@ -187,7 +187,7 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 					SetLastLocalERROR(LERROR_INVALID_DOUBLE_POINTS);
 					CVectorClear(target);
 					DestroyCVector(&coms);
-					return GetLastLocalERROR();
+					return 0;
 				}
 
 				CVectorPush(&coms, &_src[idx]);
@@ -232,7 +232,7 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 
 						CVectorClear(target);
 						DestroyCVector(&coms);
-						return GetLastLocalERROR();
+						return 0;
 					}
 
 					CVectorClear(&coms);
@@ -253,13 +253,15 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 
 						CVectorClear(target);
 						DestroyCVector(&coms);
-						return GetLastLocalERROR();
+						return 0;
 					}
 
 					CVectorClear(&coms);
 					CVectorPush(target, &got);
 					got = 0.0;
 				}
+
+				seen_out |= 1;
 
 				idx += outlen;
 				break;
@@ -268,18 +270,39 @@ error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx
 				SetLastLocalERROR(LERROR_INVALID_SYMBOL);
 				CVectorClear(target);
 				DestroyCVector(&coms);
-				return GetLastLocalERROR();
+				return 0;
 			}
 
 			idx++;
 		}
 
+		if (coms.size) {
+			CVectorPush(&coms, &EOS);
+			got = cstrtod((cstr_t)coms.stock);
+
+			if ((got < 0.00001) && GetLastLocalERROR()) {
+
+				CVectorClear(target);
+				DestroyCVector(&coms);
+				return 0;
+			}
+
+			CVectorPush(target, &got);
+			got = 0.0;
+		}
+
 		DestroyCVector(&coms);
 	}
 
-	if (_src[idx + 1] == '\0') {
+	if (_out && (_out != "") && !seen_out) {
+		CVectorClear(target);
+		SetLastLocalERROR(LERROR_INVALID_FORMAT);
+		return 0;
+	}
+
+	if (_src[idx] == '\0') {
 		idx = -1;
 	}
 
-	return GetLastLocalERROR();
+	return idx;
 }

@@ -14,32 +14,33 @@ int main() {
 	setlocale(LC_CTYPE, ".1251");
 	SetConsoleTitle("Metrology");
 
-	cvector input;
+	cvector input, text;
 	cstr_t target = NULL;
 
+	text = FReadAllToVec("in.txt");
 	input = CreateCVector(sizeof(double), 0);
 
-	FReadAllTo(&target, "in.txt");
+	int last = ParseDoubleEnumToCVec(&input, (cstr_t)text.stock, "{", "}", ",", ENUM_PARSE_SYMBOL_TYPE_ALL);
 
-	error_t err = ParseDoubleEnumToCVec(&input, target, NULL, "{", "}", ",", ENUM_PARSE_SYMBOL_TYPE_ALL);
+	DestroyCVector(&text);
 
-	if (err) {
-		printf("Local error code: 0x%X\n", err);
+	if (!last) {
+		printf("Local error code: 0x%.8X\n", GetLastLocalERROR());
 		_getch();
 	}
 
 	printf("N = %u\n", input.size);
 
-	int K_val = K(&input);
+	int K_val = calcK(&input);
 
 	printf("K = %d;\n", K_val);
-	printf("dX = %d;\n", dX(&input, K_val));
-	printf("<X> = %lf;\n", AvgX(&input));
+	printf("dX = %d;\n", calcdX(&input, K_val));
+	printf("<X> = %lf;\n", calcAvgX(&input));
 
-	double X_val = X(&input);
+	double X_val = calcX(&input);
 
 	printf("X = %lf;\n", X_val);
-	printf("S^2 = %lf;\n", Sx(&input, X_val));
+	printf("S^2 = %lf;\n", calcSx(&input, X_val));
 
 	double* p_enum = (double*)input.stock;
 

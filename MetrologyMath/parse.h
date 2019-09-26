@@ -31,12 +31,13 @@ typedef enum {
 } ENUM_PARSE_FLAGS;
 
 
-byte FReadAllTo(cstr_t* target, const cstr_t path);
+cvector FReadAllToVec(const cstr_t path);
 
 double cstrtod(const cstr_t);
 
-error_t ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src, int* _end_idx,
-	const cstr_t _in, const cstr_t _out, cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip);
+int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
+	const cstr_t _in, const cstr_t _out,
+	cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip);
 
 
 #endif // !_PARSE_H_
