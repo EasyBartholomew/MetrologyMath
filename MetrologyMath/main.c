@@ -35,7 +35,7 @@ int main() {
 		_getch();
 	}
 
-	printf("N = %u\n", input.size);
+	printf("Расчёты:\nN = %u\n", input.size);
 
 	int K_val = calcK(&input);
 
@@ -50,7 +50,7 @@ int main() {
 
 	double* p_enum = (double*)input.stock;
 
-	printf("Отсортированная последовательность:\n{");
+	printf("\nОтсортированная последовательность:\n{");
 
 	for (register unsigned i = 0; i < input.size - 1; i++) {
 		printf(" %.2lf,", p_enum[i]);
