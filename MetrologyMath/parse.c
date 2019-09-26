@@ -13,14 +13,14 @@ cvector FReadAllToVec(const cstr_t path) {
 	cvector stock = CreateCVector(sizeof(char), 0);
 
 	if (!path) {
-		SetLastLocalERROR(LERROR_INVALID_PARAM);
+		SetLastLocalERROR(LERROR_INVALID_PATH);
 		return stock;
 	}
 
 	FILE* target_file = fopen(path, "r");
 
 	if (!target_file) {
-		SetLastLocalERROR(LERROR_INVALID_PARAM); //Change latter
+		SetLastLocalERROR(LERROR_FILE_OPENNING_FAILED);
 		return stock;
 	}
 
@@ -39,6 +39,9 @@ cvector FReadAllToVec(const cstr_t path) {
 	}
 
 	fclose(target_file);
+
+	const char EOS = '\0';
+	CVectorPush(&stock, &EOS);
 
 	return stock;
 }

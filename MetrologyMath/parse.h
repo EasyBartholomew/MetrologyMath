@@ -17,6 +17,9 @@
 #define LERROR_INVALID_SYMBOL			0x00000000CU
 #define LERROR_INVALID_FORMAT			0x0000000DDU
 
+#define LERROR_INVALID_PATH				0x0000000AAU
+#define LERROR_FILE_OPENNING_FAILED		0x0000000BBU
+
 
 typedef char* cstr_t;
 typedef wchar_t* wstr_t;

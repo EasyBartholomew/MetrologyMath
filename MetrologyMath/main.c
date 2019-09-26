@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
@@ -9,23 +11,27 @@
 #include "calculations.h"
 
 
+#define DEFAULT_INPUT_FILE "in.txt"
+
+
 int main() {
 
 	setlocale(LC_CTYPE, ".1251");
-	SetConsoleTitle("Metrology");
+	SetConsoleTitle("MetrologyMath");
 
 	cvector input, text;
-	cstr_t target = NULL;
 
-	text = FReadAllToVec("in.txt");
+	text = FReadAllToVec(DEFAULT_INPUT_FILE);
 	input = CreateCVector(sizeof(double), 0);
 
 	int last = ParseDoubleEnumToCVec(&input, (cstr_t)text.stock, "{", "}", ",", ENUM_PARSE_SYMBOL_TYPE_ALL);
 
+	printf("Содержимое файла \'%s\':\n%s\n***************************\n\n",
+		DEFAULT_INPUT_FILE, (cstr_t)text.stock);
 	DestroyCVector(&text);
 
 	if (!last) {
-		printf("Local error code: 0x%.8X\n", GetLastLocalERROR());
+		printf("Local error code: 0x%.8X;\nERRNO = 0x%.8X;\n%s", GetLastLocalERROR(), errno, strerror(errno));
 		_getch();
 	}
 
@@ -44,7 +50,7 @@ int main() {
 
 	double* p_enum = (double*)input.stock;
 
-	printf("\n{");
+	printf("Отсортированная последовательность:\n{");
 
 	for (register unsigned i = 0; i < input.size - 1; i++) {
 		printf(" %.2lf,", p_enum[i]);
@@ -52,7 +58,6 @@ int main() {
 
 	printf(" %.2lf }", p_enum[input.size - 1]);
 
-	free(target);
 	DestroyCVector(&input);
 
 	_getch();
