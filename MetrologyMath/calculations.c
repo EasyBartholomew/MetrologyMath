@@ -61,5 +61,5 @@ double calcSx(const p_cvector _nums, double X) {
 	for (register unsigned i = 0; i < _nums->size; i++)
 		sum += square(nums[i] - X);
 
-	return sum / (_nums->size - 1);
+	return sqrt(sum / (_nums->size - 1));
 }
