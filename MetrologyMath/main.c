@@ -46,7 +46,7 @@ int main() {
 	double X_val = calcX(&input);
 
 	printf("X = %lf;\n", X_val);
-	printf("S^2 = %lf;\n", calcSx(&input, X_val));
+	printf("S = %lf;\n", sqrt(calcSx(&input, X_val)));
 
 	double* p_enum = (double*)input.stock;
 
