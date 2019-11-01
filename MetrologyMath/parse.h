@@ -24,6 +24,10 @@
 typedef char* cstr_t;
 typedef wchar_t* wstr_t;
 
+typedef struct {
+	double key;
+	double value;
+}dp_t, * pdp_t;
 
 typedef enum {
 	ENUM_PARSE_SYMBOL_TYPE_NONE = 0,
@@ -42,5 +46,8 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 	const cstr_t _in, const cstr_t _out,
 	cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip);
 
+int parseDP2CVec(p_cvector target, const cstr_t _src,
+	const cstr_t _in, const cstr_t _out,
+	char _separator, const ENUM_PARSE_FLAGS _flagsToSkip);
 
 #endif // !_PARSE_H_
