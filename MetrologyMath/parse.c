@@ -168,7 +168,10 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 		cvector coms;
 		coms = CreateCVector(sizeof(char), 0);
 		double got = 0.0;
-		size_t outlen = strlen(_out);
+		size_t outlen;
+
+		if (_out != NULL)
+			outlen = strlen(_out);
 
 		const char EOS = '\0';
 
@@ -308,4 +311,45 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 	}
 
 	return idx;
+}
+
+
+int parseDP2CVec(p_cvector target, const cstr_t _src,
+	const cstr_t _in, const cstr_t _out,
+	char _separator, const ENUM_PARSE_FLAGS _flagsToSkip) {
+
+	if (target->elem_size != sizeof(dp_t)) {
+		SetLastLocalERROR(LERROR_INVALID_PARAM);
+		return 0;
+	}
+
+	dp_t kv_current = { 0 };
+	char seps[2] = { 0 };
+	int last = 0;
+	int l_temp = 0;
+
+	cvector kv_vector = CreateCVector(sizeof(double), DEFAULT_INITIAL_CAPACITY_VALUE);
+	seps[0] = _separator;
+
+	while (l_temp != -1) {
+		l_temp = ParseDoubleEnumToCVec(&kv_vector, _src + last, _in, _out, seps, _flagsToSkip);
+		last += l_temp;
+
+		if (kv_vector.size != 2) {
+			CVectorClear(target);
+			DestroyCVector(&kv_vector);
+
+			SetLastLocalERROR(LERROR_INVALID_FORMAT);
+			return 0;
+		}
+
+		kv_current.key = ((double*)kv_vector.stock)[0];
+		kv_current.value = ((double*)kv_vector.stock)[1];
+
+		CVectorClear(&kv_vector);
+		CVectorPush(target, &kv_current);
+	}
+
+	DestroyCVector(&kv_vector);
+	return 1;
 }
