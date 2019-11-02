@@ -144,34 +144,33 @@ cvector calcKsy(p_cvector mEm, p_cvector mT) {
 
 cvector calcM(p_cvector source, int K, double dx) {
 
-	double rng[2] = { *(double*)CVectorEnumerate(source, 0), *(double*)CVectorEnumerate(source, 0) };
+	double up = *(double*)CVectorEnumerate(source, 0);
 	double* src = (double*)source->stock;
 
-	rng[1] += dx;
+	up += dx;
 	size_t cnt = 1;
 	size_t idx = 1;
 
 	cvector m = CreateCVector(sizeof(size_t), DEFAULT_INITIAL_CAPACITY_VALUE);
 
-	for (register short i = 1; i < K; i++) {
-		for (; idx < source->size;) {
-			if (src[idx] < rng[1]) {
+	for (register short i = 0; i < K; i++) {
+		for (; idx < source->size - 1;) {
+			if (src[idx] < up) {
 				cnt++;
 				idx++;
 			}
 			else {
-				rng[0] = rng[1];
-				rng[1] += dx;
-
-				CVectorPush(&m, &cnt);
-
-				cnt = 0;
+				break;
 			}
 		}
+
+		up += dx;
+
+		CVectorPush(&m, &cnt);
+		cnt = 0;
 	}
 
-	if (!*(size_t*)CVectorEnumerate(&m, K - 1))
-		(*(size_t*)CVectorEnumerate(&m, K - 1))++;
+	(*(size_t*)CVectorEnumerate(&m, K - 1))++;
 
 	return m;
 }
