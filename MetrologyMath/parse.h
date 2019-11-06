@@ -16,6 +16,7 @@
 #define LERROR_INVALID_DIVIDER_FORMAT	0x00000000AU
 #define LERROR_INVALID_SYMBOL			0x00000000CU
 #define LERROR_INVALID_FORMAT			0x0000000DDU
+#define LERROR_NO_VALUES				0x000000DDDU
 
 #define LERROR_INVALID_PATH				0x0000000AAU
 #define LERROR_FILE_OPENNING_FAILED		0x0000000BBU
@@ -44,10 +45,10 @@ double cstrtod(const cstr_t);
 
 int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 	const cstr_t _in, const cstr_t _out,
-	cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip);
+	cstr_t _separators, char divider, const ENUM_PARSE_FLAGS _flagsToSkip);
 
 int parseDP2CVec(p_cvector target, const cstr_t _src,
 	const cstr_t _in, const cstr_t _out,
-	char _separator, const ENUM_PARSE_FLAGS _flagsToSkip);
+	char _separator, char divider, const ENUM_PARSE_FLAGS _flagsToSkip);
 
 #endif // !_PARSE_H_
