@@ -12,10 +12,11 @@
 
 
 #define DEFAULT_INPUT_FILE "in.txt"
+#define DEFAULT_REPORT_FILE "report.txt"
 #define DEFAULT_LAPLACE_TABLE_FILE "lpt.tbl"
 
 
-#define BUFFER_X 193
+#define BUFFER_X 145
 #define BUFFER_Y 1000
 
 
@@ -27,11 +28,11 @@ static bool_t init_window() {
 	info.buff_y = BUFFER_Y;
 
 	info.enc = ".1251";
-	info.enc_category = LC_CTYPE;
+	info.enc_category = LC_ALL;
 	info.title = "MetrologyMath";
 
-	info.wnd_height = 600;
-	info.wnd_width = 1580;
+	info.wnd_height = 480;
+	info.wnd_width = 720;
 
 	info.wnd_x = 0;
 	info.wnd_y = 0;
@@ -49,6 +50,15 @@ int main() {
 		return -1;
 	}
 
+	FILE* reportStream = fopen(DEFAULT_REPORT_FILE, "w");
+
+	if (!reportStream) {
+		report("Не удалось создать файл отчёта!");
+
+		_getch();
+		return 0;
+	}
+
 	cvector input, text, lf_table;
 
 	text = FReadAllToVec(DEFAULT_LAPLACE_TABLE_FILE);
@@ -63,7 +73,7 @@ int main() {
 
 	lf_table = CreateCVector(sizeof(dp_t), DEFAULT_INITIAL_CAPACITY_VALUE);
 
-	int pdparser = parseDP2CVec(&lf_table, (cstr_t)text.stock, "<", ">", '~', ENUM_PARSE_SYMBOL_TYPE_SPACES);
+	int pdparser = parseDP2CVec(&lf_table, (cstr_t)text.stock, "<", ">", '~', '.', ENUM_PARSE_SYMBOL_TYPE_SPACES);
 
 	DestroyCVector(&text);
 
@@ -94,20 +104,33 @@ int main() {
 
 	while (1) {
 
-		last = ParseDoubleEnumToCVec(&input, (cstr_t)text.stock + last, "{", "}", ",", ENUM_PARSE_SYMBOL_TYPE_ALL);
+		last = ParseDoubleEnumToCVec(
+			&input, (cstr_t)text.stock + last,
+			"{", "}", ";\n ",
+			',',
+			ENUM_PARSE_SYMBOL_TYPE_ALL
+		);
 
-		if (!(last || cnt)) {
+		if (!last && (GetLastLocalERROR() != LERROR_NO_VALUES)) {
+
+			DestroyCVector(&text);
+			DestroyCVector(&input);
+			DestroyCVector(&lf_table);
+
+			fclose(reportStream);
+
 			printf("Local error code: 0x%.8X;\nERRNO = 0x%.8X;\n%s", GetLastLocalERROR(), errno, strerror(errno));
 			_getch();
 			return -1;
 		}
-		else if (!last) {
+		else if (GetLastLocalERROR() == LERROR_NO_VALUES) {
+			SetLastLocalERROR(LERROR_OKAY);
 			break;
 		}
 
 		cnt++;
 
-		PrintCalculations2Stream(stdout, &input, &lf_table, cnt);
+		PrintCalculations2Stream(reportStream, &input, &lf_table, cnt);
 
 		CVectorClear(&input);
 
@@ -120,6 +143,10 @@ int main() {
 	DestroyCVector(&text);
 	DestroyCVector(&input);
 	DestroyCVector(&lf_table);
+
+	fclose(reportStream);
+
+	printf("Значения успешно сохранены в \'%s\'!", DEFAULT_REPORT_FILE);
 
 	_getch();
 	return 0;

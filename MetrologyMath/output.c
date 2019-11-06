@@ -15,7 +15,7 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 
 	fprintf(where, "Отсортированная последовательность:\n{ ");
 	for (register short i = 0; i < input->size - 1; i++) {
-		fprintf(where, "%.3lf, ", *(double*)CVectorEnumerate(input, i));
+		fprintf(where, "%.3lf; ", *(double*)CVectorEnumerate(input, i));
 	}
 	fprintf(where, "%.3lf }\n\n", *(double*)CVectorEnumerate(input, input->size - 1));
 
@@ -27,7 +27,8 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 	double sx_val = calcSx(sigm_val, input->size);
 
 	fprintf(where, "K = %d;\ndx = %.3lf;\t//(max - min) / K\n<X> = %.3lf;\t//(min + max) / 2\n", k_val, dx_val, avgx_val);
-	fprintf(where, "x = %.3lf;\t(sum) / n\nSigm = %.3lf;\t//выборочное среднее\nSx = %.3lf;\n", x_val, sigm_val, sx_val);
+	fprintf(where, "x = %.3lf;\t//(sum) / n, выборочное среднее\nSigm = %.3lf;\t//Среднеквадратическое отклонение\nSx = %.3lf;\n",
+		x_val, sigm_val, sx_val);
 
 	cvector xi, xi_prev, me, pem, pi, t, t_prev, fl, fl_prev, mt, sx;
 
@@ -51,11 +52,11 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 
 	sx = calcKsy(&me, &mt);
 
-	fprintf(where, "\nx[i]\t\tx[i-1]\t\tMe\t\tPem\t\tPi\t\tt[i]\t\tt[i-1]\t\tLAP[i]\t           LAP[i-1]           Pi              Mt");
-	fprintf(where, "              X^2\n");
+	fprintf(where, "\nx[i]\t\tx[i-1]\t\tMe\t\tPem\t\t\tPi\t\t\tt[i]\t\tt[i-1]\t\tLAP[i]\t\tLAP[i-1]\tPi\t\t\tMt");
+	fprintf(where, "\t\t\tX^2\n");
 
 	for (register short i = 0; i < xi.size; i++) {
-		fprintf(where, "%.3lf\t\t%.3lf\t\t%u\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t           %.3lf             %.4lf          %.4lf",
+		fprintf(where, "%.3lf\t\t%.3lf\t\t%u\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.4lf\t\t%.4lf",
 			round(*(double*)CVectorEnumerate(&xi, i) * 1000) / 1000,
 			round(*(double*)CVectorEnumerate(&xi_prev, i) * 1000) / 1000,
 			*(size_t*)CVectorEnumerate(&me, i),
@@ -68,7 +69,7 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 			round(*(double*)CVectorEnumerate(&pi, i) * 10000) / 10000,
 			round(*(double*)CVectorEnumerate(&mt, i) * 10000) / 10000);
 
-		fprintf(where, "          %.8lf\n", *(double*)CVectorEnumerate(&sx, i));
+		fprintf(where, "\t\t%.8lf\n", *(double*)CVectorEnumerate(&sx, i));
 	}
 
 	DestroyCVector(&xi);

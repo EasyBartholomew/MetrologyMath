@@ -105,7 +105,7 @@ inline byte isnum(char c) {
 
 int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 	const cstr_t _in, const cstr_t _out,
-	cstr_t _separators, const ENUM_PARSE_FLAGS _flagsToSkip) {
+	cstr_t _separators, char divider, const ENUM_PARSE_FLAGS _flagsToSkip) {
 
 	if (!_separators) {
 		_separators = DEFAULT_SEPARATORS;
@@ -126,11 +126,11 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 		return 0;
 	}
 
+	char s_div = *localeconv()->decimal_point;
+
 	size_t idx, srclen, sepscnt, seen_out;
 
 	seen_out = idx = 0;
-
-	char divider = localeconv()->decimal_point[0];
 
 	if (strchr(_separators, divider)) {
 		SetLastLocalERROR(LERROR_INVALID_PARAM);
@@ -157,7 +157,7 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 			idx++;
 		}
 
-		SetLastLocalERROR(LERROR_INVALID_FORMAT);
+		SetLastLocalERROR(LERROR_NO_VALUES);
 		return 0;
 
 	___in_end_if___:;
@@ -196,7 +196,11 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 					return 0;
 				}
 
-				CVectorPush(&coms, &_src[idx]);
+
+				if (isnum(_src[idx]))
+					CVectorPush(&coms, &_src[idx]);
+				else
+					CVectorPush(&coms, &s_div);
 			}
 			else if ((_flagsToSkip != ENUM_PARSE_SYMBOL_TYPE_NONE) && (strchr(" \n\t", _src[idx]))) {
 
@@ -316,7 +320,7 @@ int ParseDoubleEnumToCVec(p_cvector target, const cstr_t _src,
 
 int parseDP2CVec(p_cvector target, const cstr_t _src,
 	const cstr_t _in, const cstr_t _out,
-	char _separator, const ENUM_PARSE_FLAGS _flagsToSkip) {
+	char _separator, char divider, const ENUM_PARSE_FLAGS _flagsToSkip) {
 
 	if (target->elem_size != sizeof(dp_t)) {
 		SetLastLocalERROR(LERROR_INVALID_PARAM);
@@ -332,7 +336,7 @@ int parseDP2CVec(p_cvector target, const cstr_t _src,
 	seps[0] = _separator;
 
 	while (l_temp != -1) {
-		l_temp = ParseDoubleEnumToCVec(&kv_vector, _src + last, _in, _out, seps, _flagsToSkip);
+		l_temp = ParseDoubleEnumToCVec(&kv_vector, _src + last, _in, _out, seps, divider, _flagsToSkip);
 		last += l_temp;
 
 		if (kv_vector.size != 2) {
