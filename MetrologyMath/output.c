@@ -43,7 +43,6 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 	t = calct(&xi, x_val, sigm_val);
 	t_prev = calct(&xi_prev, x_val, sigm_val);
 
-
 	fl = calcflaplace(&t, lf_table);
 	fl_prev = calcflaplace(&t_prev, lf_table);
 
@@ -52,11 +51,11 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 
 	sx = calcKsy(&me, &mt);
 
-	fprintf(where, "\nx[i]\t\tx[i-1]\t\tMe\t\tPem\t\t\tPi\t\t\tt[i]\t\tt[i-1]\t\tLAP[i]\t\tLAP[i-1]\tPi\t\t\tMt");
-	fprintf(where, "\t\t\tX^2\n");
+	fprintf(where, "\nx[i]\t\tx[i-1]\t\tMe\t\tPem\t\t\tPi\t\t\tt[i]\t\tt[i-1]\t\tLAP[i]\t\tLAP[i-1]\t\tMt");
+	fprintf(where, "\t\t\t\tX^2\n");
 
 	for (register short i = 0; i < xi.size; i++) {
-		fprintf(where, "%.3lf\t\t%.3lf\t\t%u\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.4lf\t\t%.4lf",
+		fprintf(where, "%.3lf\t\t%.3lf\t\t%u\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t%.3lf\t\t\t%.4lf",
 			round(*(double*)CVectorEnumerate(&xi, i) * 1000) / 1000,
 			round(*(double*)CVectorEnumerate(&xi_prev, i) * 1000) / 1000,
 			*(size_t*)CVectorEnumerate(&me, i),
@@ -66,7 +65,6 @@ void PrintCalculations2Stream(FILE* where, p_cvector input, p_cvector lf_table, 
 			round(*(double*)CVectorEnumerate(&t_prev, i) * 1000) / 1000,
 			round(*(double*)CVectorEnumerate(&fl, i) * 1000) / 1000,
 			round(*(double*)CVectorEnumerate(&fl_prev, i) * 1000) / 1000,
-			round(*(double*)CVectorEnumerate(&pi, i) * 10000) / 10000,
 			round(*(double*)CVectorEnumerate(&mt, i) * 10000) / 10000);
 
 		fprintf(where, "\t\t%.8lf\n", *(double*)CVectorEnumerate(&sx, i));

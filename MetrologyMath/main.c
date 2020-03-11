@@ -80,8 +80,8 @@ int main() {
 	if (!pdparser) {
 		report("Файл таблицы повреждён!");
 
-		DestroyCVector(&text);
 		DestroyCVector(&lf_table);
+		fclose(reportStream);
 		_getch();
 		return -1;
 	}
