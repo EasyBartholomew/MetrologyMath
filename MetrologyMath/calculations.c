@@ -155,7 +155,7 @@ cvector calcM(p_cvector source, int K, double dx) {
 
 	for (register short i = 0; i < K; i++) {
 		for (; idx < source->size - 1;) {
-			if (src[idx] < up) {
+			if ((src[idx] < up) || (fabs(src[idx] - up) < 0.00000001)) {
 				cnt++;
 				idx++;
 			}
